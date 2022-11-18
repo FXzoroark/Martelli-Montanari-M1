@@ -17,22 +17,23 @@ toto.
 echo(T) :- echo_on, !, write(T).
 echo(_).
 
-rules(X?=T, rename) :- var(X), var(T), !.
+rules(X?=T, rename) :- var(X), var(T).
 
-rules(X?=T, simplify) :- var(X), atomic(T), !; atomic(X), atomic(T), X==T, !.
+rules(X?=T, simplify) :- var(X), atomic(T).
 
-rules(X?=T, expand) :- var(X), compound(T), \+appears(X, T), !.
+rules(X?=T, expand) :- var(X), compound(T), not(appears(X, T)).
 
-rules(X?=T, check) :- var(X), X==T ; \+appears(X, T), !.
+rules(X?=T, check) :- var(X), X\==T , appears(X, T).
 
-rules(T?=X, orient) :- var(X), nonvar(T), !.
+rules(T?=X, orient) :- var(X), nonvar(T).
 
-rules(F?=G, decompose) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), FNAME==GNAME, FARITY==GARITY, !.
+rules(F?=G, decompose) :- functor(F, NAME, ARITY), functor(G, NAME, ARITY).
 
-rules(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), FNAME == GNAME , FARITY == GARITY, !.
+rules(F?=G, clash) :- functor(F, _, _), functor(G, _, _).
 
-appears(X, T) :- var(X), X==T, !.
-appears(X, T) :- var(X), compound(T), arg(_, T, Y), appears(X, Y).
+
+appears(X, T) :- var(X), compound(T), contains_var(X, T).
+
 
 
 
