@@ -1,4 +1,3 @@
-
 :- op(20,xfy,?=).
 
 % Prédicats d'affichage fournis
@@ -16,6 +15,9 @@ toto.
 
 echo(T) :- echo_on, !, write(T).
 echo(_).
+
+%-----------------------------------------------------------------------
+% Règles
 
 % Rename
 % renvoie vrai si T est une variable
@@ -48,22 +50,32 @@ rules(F?=G, clash) :- functor(F, _, _), functor(G, _, _).
 % Occur-check
 occur_check(V, T) :- var(V), compound(T), contains_var(V, T).
 
-application(rename, X?=T, P, Q) :- X=T, Q=P.
+%---------------------------------------------------------------------------------------------------
+% Réduits
 
-application(simplify, X?=T, P,Q) :- X=T, Q=P.
+reduit(rename, X?=T, P, Q) :- X=T, Q=P.
 
-application(expand, X?=T, P, Q) :- X=T, Q=P.
+reduit(simplify, X?=T, P,Q) :- X=T, Q=P.
 
-application(check, _, _, _):- fail.
+reduit(expand, X?=T, P, Q) :- X=T, Q=P.
 
-application(orient, T?=X, P, Q) :- append(P, [X?=T], Q).
+reduit(check, _, _, _):- fail.
 
-application(decompose, F?=G, P, Q) :-functor(F, _, ARITY), decompose(F, G, ARITY, RES), append(P, RES, Q).
+reduit(orient, T?=X, P, Q) :- append(P, [X?=T], Q).
 
-application(clash, _, _, _):- fail.
+reduit(decompose, F?=G, P, Q) :-functor(F, _, _), decomposition(F, G, RES), append(P, RES, Q).
 
+reduit(clash, _, _, _):- fail.
 
-decompose(F, G, ARITY, RES) :- ARITY == 1, arg(ARITY, F, A), arg(ARITY, G, B), RES = [A?=B].
+decomposition([H1|T1], [H2|T2], RES) :- decomposition(T1, T2, ACC), append([H1?=H2], ACC, RES).
+decomposition([], [], []).
 
-decompose(F, G, ARITY, RES) :- ARITY \== 1, NEWARITY is ARITY - 1, decompose(F, G, NEWARITY, ACC), arg(ARITY, F, A), arg(ARITY, G, B), append([A?=B], ACC, RES), write(RES).
+%---------------------------------------------------------------------------------------------------
 
+unifie([H|T]) :- aff_sys(H|T), rules(H, R), aff_regle(R, H), reduit(R, H, T, Q), unifie(Q).
+unifie([]).
+
+%--------------------------------------------------------------------------------------------------
+% Predicat pour l'affichage
+aff_sys(P) :- echo('system: '),echo(P),echo('\n').
+aff_regle(R,E) :- echo(R),echo(': '),echo(E),echo('\n').
