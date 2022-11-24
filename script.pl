@@ -41,11 +41,11 @@ rules(T?=X, orient) :- var(X), nonvar(T).
 
 % Decompose
 % renvoi vrai si X et T ont le même symbol et la même arité
-rules(F?=G, decompose) :- functor(F, NAME, ARITY), functor(G, NAME, ARITY).
+rules(F?=G, decompose) :- compound(F), compound(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY).
 
 % Clash
-% renvoi vrai si X et T n'ont pas le même symbol ou la me arité
-rules(F?=G, clash) :- functor(F, _, _), functor(G, _, _).
+% renvoi vrai si X et T n'ont pas le même symbol ou la meme arité
+rules(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY).
 
 % Occur-check
 occur_check(V, T) :- var(V), compound(T), contains_var(V, T).
@@ -59,13 +59,13 @@ reduit(simplify, X?=T, P,Q) :- X=T, Q=P.
 
 reduit(expand, X?=T, P, Q) :- X=T, Q=P.
 
-reduit(check, _, _, _):- fail.
+reduit(check, _, _, _):- echo("\n No\n"), fail.
 
 reduit(orient, T?=X, P, Q) :- append(P, [X?=T], Q).
 
-reduit(decompose, F?=G, P, Q) :-functor(F, _, _), decomposition(F, G, RES), append(P, RES, Q).
+reduit(decompose, F?=G, P, Q) :- F =.. [_|FARGS], G =.. [_|GARGS], decomposition(FARGS, GARGS, RES), append(RES, P, Q).
 
-reduit(clash, _, _, _):- fail.
+reduit(clash, _, _, _):- echo("\n No\n"), fail.
 
 decomposition([H1|T1], [H2|T2], RES) :- decomposition(T1, T2, ACC), append([H1?=H2], ACC, RES).
 decomposition([], [], []).
@@ -73,7 +73,7 @@ decomposition([], [], []).
 %---------------------------------------------------------------------------------------------------
 
 unifie([H|T]) :- aff_sys(H|T), rules(H, R), aff_regle(R, H), reduit(R, H, T, Q), unifie(Q).
-unifie([]).
+unifie([]) :- echo("\n Yes\n").
 
 %--------------------------------------------------------------------------------------------------
 % Predicat pour l'affichage
