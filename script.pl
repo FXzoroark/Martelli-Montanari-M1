@@ -11,44 +11,45 @@ clr_echo :- retractall(echo_on).
 % echo(T): si le flag echo_on est positionné, echo(T) affiche le terme T
 %          sinon, echo(T) réussit simplement en ne faisant rien.
 
-toto.
-
 echo(T) :- echo_on, !, write(T).
 echo(_).
 
 %-----------------------------------------------------------------------
+%   QUESTION 1.
+%-----------------------------------------------------------------------
+
 % Règles
 
 % Rename
 % renvoie vrai si T est une variable
-regles(X?=T, rename) :- var(X), var(T).  
+regles(X?=T, rename) :- var(X), var(T),!.  
 
 % Simplify
 % renvoie vrai si X est une constante
-regles(X?=T, simplify) :- var(X), atomic(T).
+regles(X?=T, simplify) :- var(X), atomic(T),!.
 
 % Expand
 % renvoi vrai si T est une fonction et X n'apparaît pas dans T
-regles(X?=T, expand) :- var(X), compound(T), not(occur_check(X, T)).
+regles(X?=T, expand) :- var(X), compound(T), not(occur_check(X, T)),!.
 
 % Check
 % renvoie vrai si X est différent de T et X apparaît dans T
-regles(X?=T, check) :- var(X), X\==T , occur_check(X, T).
+regles(X?=T, check) :- var(X), X\==T , occur_check(X, T),!.
 
 % Orient
 % renvoi vrai si T n'est pas une variable
-regles(T?=X, orient) :- var(X), nonvar(T).
+regles(T?=X, orient) :- var(X), nonvar(T),!.
 
 % Decompose
 % renvoi vrai si X et T ont le même symbol et la même arité
-regles(F?=G, decompose) :- compound(F), compound(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY).
+regles(F?=G, decompose) :- compound(F), compound(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY),!.
 
 % Clash
 % renvoi vrai si X et T n'ont pas le même symbol ou la meme arité
-regles(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY).
+regles(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY),!.
 
 % Occur-check
-occur_check(V, T) :- var(V), compound(T), contains_var(V, T).
+occur_check(V, T) :- var(V), compound(T), contains_var(V, T),!.
 
 %---------------------------------------------------------------------------------------------------
 % Réduits
@@ -72,10 +73,14 @@ decomposition([], [], []).
 
 %---------------------------------------------------------------------------------------------------
 
-unifie_ori([H|T], STRATEGY) :- aff_sys(H|T), regles(H, R), aff_regle(R, H), reduit(R, H, T, Q), unifie(Q, STRATEGY).
-unifie_ori([], _) :- echo("\n Yes\n").
+unifie_([H|T], STRATEGY) :- aff_sys(H|T), regles(H, R), aff_regle(R, H), reduit(R, H, T, Q), unifie(Q, STRATEGY).
+unifie_([], _) :- echo("\n Yes\n").
 
 %---------------------------------------------------------------------------------------------------
+%   QUESTION 2.
+%---------------------------------------------------------------------------------------------------
+
+
 get_i(E, I) :- (regles(E, clash); regles(E, check)) -> I = 5, !;
                (regles(E, rename); regles(E, simplify)) -> I = 4, !;
                regles(E, orient) -> I = 3, !;
@@ -89,19 +94,23 @@ choix_eq([H|T], TMP, E, RES) :- get_i(E, I1), get_i(H, I2),
 choix_eq([], TMP, E, RES) :- append([E], TMP , RES). %,!.
 
 
-last_list(P, [LAST|RESTE]) :- reverse(P, [LAST|R]), reverse(R, RESTE). 
-%last_list([], []).
+last_list(P, [LAST|RESTE]) :- reverse(P, [LAST|R]), reverse(R, RESTE).
 
 %---------------------------------------------------------------------------------------------------
 
-unifie(P, choix_premier) :- unifie_ori(P, choix_premier).
+unifie(P, choix_premier) :- unifie_(P, choix_premier).
 
-unifie([H|T], choix_pondere_1) :- choix_eq(T, [], H, Q), unifie_ori(Q, choix_pondere_1).
+unifie([H|T], choix_pondere_1) :- choix_eq(T, [], H, Q), unifie_(Q, choix_pondere_1).
 
-unifie(P, choix_dernier) :- last_list(P, RES), unifie_ori(RES, choix_dernier).
+unifie(P, choix_dernier) :- last_list(P, RES), unifie_(RES, choix_dernier).
 
-%unifie([], _) :- unifie_ori([], _).
+%---------------------------------------------------------------------------------------------------
+%   QUESTION 3.
+%---------------------------------------------------------------------------------------------------
 
+unif(P,S) :- clr_echo, unifie(P,S).
+
+trace_unif(P,S) :- set_echo, unifie(P,S).
 
 %---------------------------------------------------------------------------------------------------
 % Predicat pour l'affichage
