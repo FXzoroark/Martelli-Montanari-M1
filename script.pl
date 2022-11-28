@@ -21,31 +21,31 @@ echo(_).
 
 % Rename
 % renvoie vrai si T est une variable
-rules(X?=T, rename) :- var(X), var(T).  
+regles(X?=T, rename) :- var(X), var(T).  
 
 % Simplify
 % renvoie vrai si X est une constante
-rules(X?=T, simplify) :- var(X), atomic(T).
+regles(X?=T, simplify) :- var(X), atomic(T).
 
 % Expand
 % renvoi vrai si T est une fonction et X n'apparaît pas dans T
-rules(X?=T, expand) :- var(X), compound(T), not(occur_check(X, T)).
+regles(X?=T, expand) :- var(X), compound(T), not(occur_check(X, T)).
 
 % Check
 % renvoie vrai si X est différent de T et X apparaît dans T
-rules(X?=T, check) :- var(X), X\==T , occur_check(X, T).
+regles(X?=T, check) :- var(X), X\==T , occur_check(X, T).
 
 % Orient
 % renvoi vrai si T n'est pas une variable
-rules(T?=X, orient) :- var(X), nonvar(T).
+regles(T?=X, orient) :- var(X), nonvar(T).
 
 % Decompose
 % renvoi vrai si X et T ont le même symbol et la même arité
-rules(F?=G, decompose) :- compound(F), compound(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY).
+regles(F?=G, decompose) :- compound(F), compound(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY).
 
 % Clash
 % renvoi vrai si X et T n'ont pas le même symbol ou la meme arité
-rules(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY).
+regles(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY).
 
 % Occur-check
 occur_check(V, T) :- var(V), compound(T), contains_var(V, T).
@@ -72,10 +72,38 @@ decomposition([], [], []).
 
 %---------------------------------------------------------------------------------------------------
 
-unifie([H|T]) :- aff_sys(H|T), rules(H, R), aff_regle(R, H), reduit(R, H, T, Q), unifie(Q).
-unifie([]) :- echo("\n Yes\n").
+unifie_ori([H|T], STRATEGY) :- aff_sys(H|T), regles(H, R), aff_regle(R, H), reduit(R, H, T, Q), unifie(Q, STRATEGY).
+unifie_ori([], _) :- echo("\n Yes\n").
 
-%--------------------------------------------------------------------------------------------------
+%---------------------------------------------------------------------------------------------------
+get_i(E, I) :- (regles(E, clash); regles(E, check)) -> I = 5, !;
+               (regles(E, rename); regles(E, simplify)) -> I = 4, !;
+               regles(E, orient) -> I = 3, !;
+               regles(E, decompose) -> I = 2, !;
+               regles(E, expand) -> I = 1, !.
+
+choix_eq([H|T], TMP, E, RES) :- get_i(E, I1), get_i(H, I2),
+                                (I1>=I2 -> append([H], TMP, NEWTMP),choix_eq(T, NEWTMP, E, RES);
+                                    (choix_eq(T, [E|TMP], H, RES))
+                                ).
+choix_eq([], TMP, E, RES) :- append([E], TMP , RES). %,!.
+
+
+last_list(P, [LAST|RESTE]) :- reverse(P, [LAST|R]), reverse(R, RESTE). 
+%last_list([], []).
+
+%---------------------------------------------------------------------------------------------------
+
+unifie(P, choix_premier) :- unifie_ori(P, choix_premier).
+
+unifie([H|T], choix_pondere_1) :- choix_eq(T, [], H, Q), unifie_ori(Q, choix_pondere_1).
+
+unifie(P, choix_dernier) :- last_list(P, RES), unifie_ori(RES, choix_dernier).
+
+%unifie([], _) :- unifie_ori([], _).
+
+
+%---------------------------------------------------------------------------------------------------
 % Predicat pour l'affichage
 aff_sys(P) :- echo('system: '),echo(P),echo('\n').
 aff_regle(R,E) :- echo(R),echo(': '),echo(E),echo('\n').
