@@ -88,7 +88,7 @@ decomposition([], [], []).
 
 %---------------------------------------------------------------------------------------------------
 
-unifie_([H|T], S) :- aff_sys(H|T), regles(H, R), aff_regle(R, H), reduit(R, H, T, Q), unifie(Q, S).
+unifie_([H|T], S) :- aff_sys(H|T), regles(H, R), aff_regle(H, R), reduit(R, H, T, Q), unifie(Q, S).
 unifie_(fin) :- echo("\n Yes\n").
 
 %---------------------------------------------------------------------------------------------------
@@ -116,11 +116,11 @@ last_list(P, [LAST|RESTE]) :- reverse(P, [LAST|R]), reverse(R, RESTE).
 % Unification avec les différentes stratégies.
 
 
-unifie(P, choix_premier) :- echo(P),unifie_(P, choix_premier).
+unifie(P, choix_premier) :- unifie_(P, choix_premier).
 
-unifie([H|T], choix_pondere) :- echo([H|T]),choix_eq(T, [], H, Q), unifie_(Q, choix_pondere).
+unifie([H|T], choix_pondere) :- choix_eq(T, [], H, Q), unifie_(Q, choix_pondere).
 
-unifie(P, choix_dernier) :- echo(P),last_list(P, RES), unifie_(RES, choix_dernier).
+unifie(P, choix_dernier) :- last_list(P, RES), unifie_(RES, choix_dernier).
 
 unifie([], _) :- unifie_(fin).
 
@@ -137,7 +137,7 @@ trace_unif(P,S) :- set_echo, unifie(P,S).
 %---------------------------------------------------------------------------------------------------
 % Prédicat pour l'affichage
 aff_sys(P) :- echo('system: '),echo(P),echo('\n').
-aff_regle(R,E) :- echo(R),echo(': '),echo(E),echo('\n').
+aff_regle(E,R) :- echo(R),echo(': '),echo(E),echo('\n').
 
 
 
