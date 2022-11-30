@@ -2,7 +2,6 @@ include(script).
 
 :- begin_tests(regles).
 
-%test(oui, [forall(member(R ,[check, clash]))]) :- regles(f(X) ?= g(X), R).
 test(rename) :- regles(X?=T, rename).
 test(rename, [fail]) :- regles(a?=b, rename).
 test(rename, [fail]) :- regles(X?=a, rename).
@@ -94,12 +93,7 @@ test(last_list, [true(RES == [f(Y) ?= Z, X?=T, X?=a])]) :- last_list([X?=T, X?=a
 
 :- begin_tests(unifie_).
 
-test(last_list, [true(RES == [f(Y) ?= Z, X?=T, X?=a])]) :- last_list([X?=T, X?=a, f(Y) ?= Z], RES).
-test(last_list, [true(RES == [f(Y) ?= Z, X?=T, X?=a])]) :- last_list([X?=T, X?=a, f(Y) ?= Z], RES).
-test(last_list, [true(RES == [f(Y) ?= Z, X?=T, X?=a])]) :- last_list([X?=T, X?=a, f(Y) ?= Z], RES).
-test(last_list, [true(RES == [f(Y) ?= Z, X?=T, X?=a])]) :- last_list([X?=T, X?=a, f(Y) ?= Z], RES).
-test(last_list, [true(RES == [f(Y) ?= Z, X?=T, X?=a])]) :- last_list([X?=T, X?=a, f(Y) ?= Z], RES).
-test(last_list, [true(RES == [f(Y) ?= Z, X?=T, X?=a])]) :- last_list([X?=T, X?=a, f(Y) ?= Z], RES).
-
+test(unifie, [forall(member(STRATEGY ,[choix_premier, choix_pondere, choix_dernier]))]) :- unifie([f(X,Y)?= f(g(Z), h(a)), Z ?= f(Y)], STRATEGY).
+test(unifie, [forall(member(STRATEGY ,[choix_premier, choix_pondere, choix_dernier])), fail]) :- unifie([f(X,Y)?= f(g(Z), h(a)), Z ?= f(Y), X ?= f(X)], STRATEGY).
 
 :- end_tests(unifie_).
