@@ -148,7 +148,7 @@ main :- set_echo,
         write("P est un système d'équation du type [X1?=Y1, ... ,Xn?=Yn] où Xi, Yi peuvent être des termes (f(X)), des variables (X) ou des constantes (a).\n\n"),
         write("S est la stratégie d'unification souhaitée:\nchoix_premier\nchoix_pondere\nchoix_dernier\n\n"),
         write("Par défaut l'affichage des étapes est activé.\n\n")    ,
-        write("Pour désactiver l'affichage des étapes et unifier, saisir:\ntrace_unif(P,S).\n\n"),
-        write("Pour activer l'affichage des étapes et unifier, saisir:\nunif(P,S).\n\n"),
+        write("Pour activer l'affichage des étapes et unifier, saisir:\ntrace_unif(P,S).\n\n"),
+        write("Pour désactiver l'affichage des étapes et unifier, saisir:\nunif(P,S).\n\n"),
         write("Pour simplement unifier, saisir:\nunifie(P,S).\n\n\n").
 
