@@ -93,7 +93,7 @@ test(last_list, [true(RES == [f(Y) ?= Z, X?=T, X?=a])]) :- last_list([X?=T, X?=a
 
 :- begin_tests(unifie_).
 
-test(unifie, [forall(member(STRATEGY ,[choix_premier, choix_pondere, choix_dernier]))]) :- unifie([f(X,Y)?= f(g(Z), h(a)), Z ?= f(Y)], STRATEGY).
-test(unifie, [forall(member(STRATEGY ,[choix_premier, choix_pondere, choix_dernier])), fail]) :- unifie([f(X,Y)?= f(g(Z), h(a)), Z ?= f(Y), X ?= f(X)], STRATEGY).
+test(unifie, [forall(member(STRATEGY ,[choix_premier, choix_pondere, choix_dernier]))]) :- unif([f(X,Y)?= f(g(Z), h(a)), Z ?= f(Y)], STRATEGY).
+test(unifie, [forall(member(STRATEGY ,[choix_premier, choix_pondere, choix_dernier])), fail]) :- unif([f(X,Y)?= f(g(Z), h(a)), Z ?= f(Y), X ?= f(X)], STRATEGY).
 
 :- end_tests(unifie_).

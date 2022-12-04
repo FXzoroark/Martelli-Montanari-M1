@@ -22,34 +22,34 @@ echo(_).
 
 % Rename
 % renvoie vrai si T est une variable
-regles(X?=T, rename) :- var(X), var(T),!.  
+regles(X?=T, rename) :- var(X), var(T), !.  
 
 % Simplify
 % renvoie vrai si T est une constante
-regles(X?=T, simplify) :- var(X), atomic(T),!.
+regles(X?=T, simplify) :- var(X), atomic(T), !.
 
 % Expand
 % renvoi vrai si T est une fonction et X n'apparaît pas dans T
-regles(X?=T, expand) :- var(X), compound(T), not(occur_check(X, T)),!.
+regles(X?=T, expand) :- var(X), compound(T), not(occur_check(X, T)), !.
 
 % Check
 % renvoie vrai si X est différent de T et X apparaît dans T
-regles(X?=T, check) :- var(X), X\==T , occur_check(X, T),!.
+regles(X?=T, check) :- var(X), X\==T , occur_check(X, T), !.
 
 % Orient
 % renvoi vrai si T n'est pas une variable
-regles(T?=X, orient) :- var(X), nonvar(T),!.
+regles(T?=X, orient) :- var(X), nonvar(T), !.
 
 % Decompose
 % renvoi vrai si X et T ont le même symbol et la même arité
-regles(F?=G, decompose) :- compound(F), compound(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY),!.
+regles(F?=G, decompose) :- compound(F), compound(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY), !.
 
 % Clash
 % renvoi vrai si X et T n'ont pas le même symbol ou la meme arité
-regles(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY),!.
+regles(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY), !.
 
 % Occur-check
-occur_check(V, T) :- var(V), compound(T), contains_var(V, T),!.
+occur_check(V, T) :- var(V), compound(T), contains_var(V, T), !.
 
 %---------------------------------------------------------------------------------------------------
 % Réduits
@@ -116,11 +116,11 @@ last_list(P, [LAST|RESTE]) :- reverse(P, [LAST|R]), reverse(R, RESTE).
 % Unification avec les différentes stratégies.
 
 
-unifie(P, choix_premier) :- unifie_(P, choix_premier).
+unifie(P, choix_premier) :- unifie_(P, choix_premier), !.
 
-unifie([H|T], choix_pondere) :- choix_eq(T, [], H, Q), unifie_(Q, choix_pondere).
+unifie([H|T], choix_pondere) :- choix_eq(T, [], H, Q), unifie_(Q, choix_pondere), !.
 
-unifie(P, choix_dernier) :- last_list(P, RES), unifie_(RES, choix_dernier).
+unifie(P, choix_dernier) :- last_list(P, RES), unifie_(RES, choix_dernier), !.
 
 unifie([], _) :- unifie_(fin).
 
