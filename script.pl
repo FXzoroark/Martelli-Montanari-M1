@@ -42,11 +42,11 @@ regles(T?=X, orient) :- var(X), nonvar(T), !.
 
 % Decompose
 % renvoi vrai si X et T ont le même symbol et la même arité
-regles(F?=G, decompose) :- compound(F), compound(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY), !.
+regles(F?=G, decompose) :- nonvar(F), nonvar(G), functor(F, NAME, ARITY), functor(G, NAME, ARITY), !.
 
 % Clash
 % renvoi vrai si X et T n'ont pas le même symbol ou la meme arité
-regles(F?=G, clash) :- compound(F), compound(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY), !.
+regles(F?=G, clash) :- nonvar(F), nonvar(G), functor(F, FNAME, FARITY), functor(G, GNAME, GARITY), (FNAME \== GNAME ; FARITY \== GARITY), !.
 
 % Occur-check
 occur_check(V, T) :- var(V), compound(T), contains_var(V, T), !.
